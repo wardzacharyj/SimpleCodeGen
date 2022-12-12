@@ -1,0 +1,463 @@
+{
+  "name": "simple-code-gen",
+  "displayName": "Simple Code Gen",
+  "description": "Create and update files from templates",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.73.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:simple-code-gen.generate"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "simple-code-gen.generate",
+        "category": "Simple Code Generator",
+        "title": "Select Recipe"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Configuration",
+      "properties": {
+        "simpleCodeGenerator.disablePerforceOperations": {
+          "type": "boolean",
+          "description": "Flag that determines if the extension will skip perforce operations",
+          "default": false
+        },
+        "simpleCodeGenerator.recipes": {
+          "default": [],
+          "description": "List of details for updating or creating files",
+          "scope": "resource",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "title": "Recipe Details",
+            "description": "The contents of code generation process",
+            "default": {
+              "name": "Recipe name",
+              "inputs": [
+                {
+                  "title": "Title of input box",
+                  "suggestion": "Suggestion displayed in input box",
+                  "prompt": "Prompt for the input",
+                  "regexValidator": "",
+                  "regexErrorDescription": "Description of what the regex validator checks if present",
+                  "fixedChoices": [
+                      {
+                          "title": "Title",
+                          "description": "Description of the choice",
+                          "value": "The value of this choice"
+                      }
+                  ],
+                  "defaultValue": "The default value of this choice",
+                  "symbol": "${INPUT_SYMBOL}"
+                }
+              ],
+              "templates": [
+                {
+                  "name": "The name of the template",
+                  "singleLine": "Small text snippet that is used if a path is not provided",
+                  "path": "The path of your template",
+                  "symbolArguements": [
+                    "${INPUT_SYMBOL}"
+                  ],
+                  "targets": [
+                      "targetNameHere1",
+                      "targetNameHere2"
+                  ]
+                }
+              ],
+              "updateTargets": [
+                {
+                  "name": "Unique name of target",
+                  "path": "Path to file that will be updated",
+                  "insertCriteria": {
+                      "position": "before",
+                      "matchMode": "useString",
+                      "insertAtLineMatching": "Example String Match",
+                      "stopSearchAtLineMatching": "Example Stop Search String Match"
+                  }
+                }
+              ],
+              "createTargets": [
+                {
+                  "name": "Unique target name",
+                  "output_name": "${INPUT_SYMBOL}Component.cpp",
+                  "output_path": "Path to output the newly generated file"
+                }
+              ]
+            },
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the recipe",
+                "default": "",
+                "examples": ["Recipe Name"]
+              },
+              "inputs": {
+                "type":"array",
+                "default": [],
+                "description": "The list of required input objects",
+                "examples": [
+                  [
+                    {
+                      "title": "Title of input box",
+                      "suggestion": "Suggestion displayed in input box",
+                      "prompt": "Prompt for the input",
+                      "regexValidator": "",
+                      "regexErrorDescription": "Description of what the regex validator checks if present",
+                      "fixedChoices": [
+                          {
+                              "title": "Title",
+                              "description": "Description of the choice",
+                              "value": "The value of this choice"
+                          }
+                      ],
+                      "defaultValue": "The default value of this choice",
+                      "symbol": "${INPUT_SYMBOL}"
+                    }
+                  ]
+                ],
+                "items": {
+                  "type": "object",
+                  "title": "Input Details",
+                  "examples": [
+                    {
+                      "title": "",
+                      "suggestion": "",
+                      "prompt": "",
+                      "regexValidator": "",
+                      "regexErrorDescription": "",
+                      "fixedChoices": [
+                          {
+                            "title": "",
+                            "description": "",
+                            "value": ""
+                          }
+                      ],
+                      "defaultValue": "",
+                      "symbol": ""
+                    }
+                  ],
+                  "properties": {
+                    "title": {
+                      "type": "string",
+                      "default": "Name",
+                      "description": "The title of this input"
+                    },
+                    "suggestion": {
+                      "type": "string",
+                      "default": "Suggestion displayed in input box...",
+                      "description": "What will be displayed as a suggestion in the input box when empty"
+                    },
+                    "prompt": {
+                      "type": "string",
+                      "default": "Please enter the required input...",
+                      "description": "What will be displayed as a prompt to the user"
+                    },
+                    "regexValidator": {
+                      "type": "string",
+                      "default": "",
+                      "examples": ["[a-zA-Z]"],
+                      "description": "An optional regular expression that will be used to validate user input if present"
+                    },
+                    "regexErrorDescription": {
+                      "type": "string",
+                      "default": "",
+                      "examples": ["Only letters a-z and A-Z are accepted"],
+                      "description": "An optional description of what a provided regula expression expects as valid input"
+                    },
+                    "fixedChoices": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 1,
+                      "default": "[]",
+                      "description": "An optional description of what a provided regula expression expects as valid input",
+                      "examples": [
+                        [
+                          {
+                            "title": "Write",
+                            "description": "Option to write to a file",
+                            "value": "w"
+                          },
+                          {
+                            "title": "Read",
+                            "description": "Option to read to a file",
+                            "value": "r"
+                          },
+                          {
+                            "title": "Append",
+                            "description": "Option to append to a file",
+                            "value": "w+"
+                          }
+                        ]
+                      ],
+                      "items": {
+                        "type": "object",
+                        "title": "Recipe Details",
+                        "description": "The contents of code generation process",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "description": "The title of the fixed input value",
+                            "default": ""
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "The description of the fixed input value",
+                            "default": ""
+                          },
+                          "value": {
+                            "type": "string",
+                            "description": "The vaue of the fixed input choice that will be used as an input to any templates that require this input",
+                            "default": ""
+                          }
+                        },
+                        "required": ["title", "value"]
+                      }
+                    },
+                    "defaultValue": {
+                      "type": "string",
+                      "description": "The default value of this input",
+                      "default": ""
+                    },
+                    "symbol": {
+                      "type": "string",
+                      "default": "",
+                      "description": "The symbol that will be populated with the user provided value and replaced where matches are found"
+                    }
+                  },
+                  "required": ["title", "suggestion", "prompt", "symbol"],
+                  "dependencies": {
+                    "regexValidator": {
+                      "required": [ "regexErrorDescription" ]
+                    },
+                    "regexErrorDescription": {
+                      "required": [ "regexValidator" ]
+                    }
+                  }
+                }
+              },
+              "templates": {
+                "type": "array",
+                "default": [],
+                "description": "The list of templates",
+                "items": {
+                  "type": "object",
+                  "title": "Template Object",
+                  "default": {
+                    "name": "",
+                    "path": "",
+                    "updateTargets": [],
+                    "createTargets": []
+                  },
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "The name of the template",
+                      "default": ""
+                    },
+                    "singleLine": {
+                      "type": "string",
+                      "description": "A string to use instead of the contents of a file",
+                      "default": ""
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "A file path to the file containing the template text, will be ignored if singleLine is present",
+                      "default": ""
+                    },
+                    "updateTargets": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "description": "An array of unique strings that map to a update target entry",
+                      "default": [],
+                      "items": {
+                        "type": "string",
+                        "description": "A unqiue update target name",
+                        "default": ""
+                      }
+                    },
+                    "createTargets": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "description": "An array of unique strings that map to a create target entry",
+                      "default": [],
+                      "items": {
+                        "type": "string",
+                        "description": "A unqiue create target name",
+                        "default": ""
+                      }
+                    }
+                  },
+                  "oneOf": [
+                    {
+                      "required": ["name", "path", "symbolArguements", "updateTargets", "createTargets"],
+                      "not": { "required": ["singleLine"] }
+                    },
+                    {
+                      "required": ["name", "path", "symbolArguements", "updateTargets"],
+                      "not": { "required": ["singleLine", "createTargets"] }
+                    },
+                    {
+                      "required": ["name", "path", "symbolArguements", "createTargets"],
+                      "not": { "required": ["singleLine", "updateTargets"] }
+                    },
+                    {
+                      "required": ["name", "singleLine", "symbolArguements", "updateTargets", "createTargets"],
+                      "not": { "required": ["path"] }
+                    },
+                    {
+                      "required": ["name", "singleLine", "symbolArguements", "updateTargets"],
+                      "not": { "required": ["path", "createTargets"] }
+                    },
+                    {
+                      "required": ["name", "singleLine", "symbolArguements", "createTargets"],
+                      "not": { "required": ["path", "updateTargets"] }
+                    }
+                  ]
+                }
+              },
+              "updateTargets": {
+                "type": "array",
+                "uniqueItems": true,
+                "default": [],
+                "description": "The list of update targets",
+                "items": {
+                  "type": "object",
+                  "default": {
+                    "name": "",
+                    "path": "",
+                    "insertCriteria": {
+                      "position": "",
+                      "matchMode": "",
+                      "insertAtLineMatching": ""
+                    }
+                  },
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "The unique name of the update target",
+                      "default": ""
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "",
+                      "default": ""
+                    },
+                    "insertCriteria": {
+                      "type": "object",
+                      "description": "The criteria used for determining where to insert template content",
+                      "default": {
+                        "name": "",
+                        "path": "",
+                        "insertCriteria": {
+                          "position": "before",
+                          "matchMode": "useString",
+                          "insertAtLineMatching": ""
+                        }
+                      },
+                      "properties": {
+                        "position": {
+                          "type": "string",
+                          "default": "before",
+                          "examples": ["before", "after"],
+                          "enum": ["before", "after"],
+                          "description": "When the match within the update target is found, this flag tells us whether or not we insert before or after that line"
+                        },
+                        "matchMode": {
+                          "type": "string",
+                          "default": "useString",
+                          "enum": ["useString", "useRegex"],
+                          "examples": ["useString", "useRegex"],
+                          "description": "Whether or we will treat match criteria as strings or regular expression"
+                        },
+                        "insertAtLineMatching": {
+                          "type": "string",
+                          "default": "",
+                          "description": "The string or regular expression used as the criteria for determining where to insert a populated template."
+                        },
+                        "stopSearchAtLineMatching": {
+                          "type": "string",
+                          "default": "",
+                          "description": "Optional criteria to abandon searching for new matches. If present we will continue searching for matches and updating our insert index until a line matches this exit criteria"
+                        }
+                      },
+                      "required": ["position", "matchMode", "insertAtLineMatching"]
+                    }
+                  },
+                  "required": ["name", "path", "insertCriteria"]
+                }
+              },
+              "createTargets": {
+                "type": "array",
+                "default": [],
+                "description": "The list expected create targets",
+                "items": {
+                  "type": "object",
+                  "description": "",
+                  "default": {
+                    "name": "",
+                    "outputFileName": "",
+                    "outputPath": ""
+                  },
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "The name of the create target, this is different from the name of the file that will be created",
+                      "default": ""
+                    },
+                    "outputFileName": {
+                      "type": "string",
+                      "description": "The name of the file that will be generated",
+                      "default": ""
+                    },
+                    "outputPath": {
+                      "type": "string",
+                      "description": "",
+                      "default": ""
+                    }
+                  },
+                  "required": ["name", "outputFileName", "outputPath"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.73.0",
+    "@types/glob": "^8.0.0",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "16.x",
+    "@typescript-eslint/eslint-plugin": "^5.42.0",
+    "@typescript-eslint/parser": "^5.42.0",
+    "eslint": "^8.26.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.1.0",
+    "typescript": "^4.8.4",
+    "ts-loader": "^9.4.1",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "@vscode/test-electron": "^2.2.0"
+  }
+}
