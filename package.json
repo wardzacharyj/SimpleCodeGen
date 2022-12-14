@@ -25,6 +25,11 @@
       "type": "object",
       "title": "Configuration",
       "properties": {
+        "simpleCodeGenerator.disablePerforceOperations": {
+          "type": "boolean",
+          "description": "Flag that determines if the extension will skip perforce operations",
+          "default": false
+        },
         "simpleCodeGenerator.recipes": {
           "default": [],
           "description": "List of details for updating or creating files",
