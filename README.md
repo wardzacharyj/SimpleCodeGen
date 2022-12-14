@@ -1,8 +1,27 @@
-# simple-code-gen README
+# Simple Code Generator
 
-This is the README for your extension "simple-code-gen". After writing up a brief description, we recommend including the following sections.
+This extension allows users to describe "recipes" for collecting user inputed values in order to transform existing files or create new ones.
 
 ## Features
+
+
+## Input
+<details>
+    <summary>Text Input</summary>
+    <ul>
+        <li>
+            <h4>Default</h4>
+            <p><img src="images/text_input_example.png"/></p>
+        </li>
+        <li>
+            <h4>Regex Validation</h4>
+            <p><img src="images/text_input_error_example.png"/></p>
+        </li>
+    </ul>
+</details>
+
+
+
 
 Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
 
