@@ -86,13 +86,10 @@ class RecipeInput implements Input {
                 return false;
             }
             for (const choice of fixedChoices) {
-                const { title, description, value } = choice;
+                const { title, value } = choice;
                 if (!title) {
                     return false;
                 } 
-                if (!description) {
-                    return false;
-                }
                 if (!value) {
                     return false;
                 }
