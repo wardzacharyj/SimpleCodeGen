@@ -66,7 +66,6 @@ Only relevant fields are included in this snippet
 
   "symbol":                "[Required] Symbol that will be replaced with the provided value",
 
-  // [Optional]
   "defaultValue":          "[Optional] The initial value will be present in the input box",
   "regexValidator":        "[Optional] Expression that will validate the input",
   "regexErrorDescription": "[Optional] Message to show if the input value violates the expression",
