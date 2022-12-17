@@ -1,6 +1,6 @@
 # Simple Code Generator
 
-This extension allows users to describe "recipes" for collecting user inputed values in order to transform existing files or create new ones.
+This extension allows users to describe "recipes" for collecting user input values in order to transform existing files or create new ones.
 
 # Recipe
 You can specify multiple recipes in your `.vscode/settings.json` file. A recipe can be constructed and customized from the following components:
@@ -9,11 +9,15 @@ You can specify multiple recipes in your `.vscode/settings.json` file. A recipe 
 * [Update Targets](#update-targets)
 * [Create Targets](#create-targets)
 
+<figure>
+    <img src='images/recipe_picker.png' alt='recipe_picker' />
+    <figcaption><i>Recipe Picker</i></figcaption>
+</figure>
 <p><br></p>
 
 # Inputs
 
-A recipe's optional list of inputs allows you to specify symbols or keywords that should be replaced if encountered in templates, update targets, or the recipe object itself. For example, if a recipe contaied an input object that collected a year from a user and mapped it to a symbol called `${YEAR}` this symbol would be replaced by the user inputed value.
+A recipe's optional list of inputs allows you to specify symbols or keywords that should be replaced if encountered in templates, update targets, or the recipe object itself. For example, if a recipe contaied an input object that collected a year from a user and mapped it to a symbol called `${YEAR}` this symbol would be replaced by the user provided value.
 
 ### Example Recipe (~/workpace/.vscode/settings.json)
 Only relevant fields are included in this snippet
@@ -73,7 +77,7 @@ Only relevant fields are included in this snippet
 }
 ```
 
-In some situations where the value you want to map to a symbol exists within a fixed set choices it might be more conveient to allow users to select it from a list of options. This can be achived by adding the optional `fixedChoices` array to your input properties.
+In some situations where the value you want to map to a symbol exists within a fixed set choices it might be more convenient to allow users to select it from a list of options. This can be achieved by adding the optional `fixedChoices` array to your input properties.
 
 <figure>
     <img src='images/fixed_input_example.png' alt='fixed input image' />
@@ -81,7 +85,7 @@ In some situations where the value you want to map to a symbol exists within a f
 </figure>
 
 
-### Fixed Choices Object Properties
+## Fixed Choice Object Properties
 Only relevant fields are included in this snippet
 ```json
 {
@@ -103,14 +107,18 @@ Only relevant fields are included in this snippet
 
 # Templates
 
-Templates are the snippets of code or text you would like to use to update existing files or create new ones. Templates can either be written in the recipe itself using the `singleLine` property or from a file using the `path`. property. New lines and whitespace are preserved in both. `symbolArguements` are an exclusive list of input symbols that will be evaluated, default behavior will consider all input symbols for this template. A template must have at least one entry in `updateTargets` or `createTargets`. The target string should match the `name` property of the updateTarget or createTarget.
+Templates are the snippets of code or text you would like to use to update existing files or create new ones. Templates can either be written in the recipe itself using the `singleLine` property or read from a file using the `path` property. New lines and whitespace are preserved in both. 
+
+A template's `symbolArguements` property is optional exclusive list of input symbols that will be evaluated. The default behavior will consider all input symbols for this template, but you can use this property if you want to limit the inputs to a smaller subset.
+
+ A template must have at least one entry in `updateTargets` or `createTargets`. The target string should match the `name` property of the updateTarget or createTarget.
 
 ```json
   {
       "name":             "[Optional] A name to give this template",
       "symbolArguements": [],
 
-      "path":             "[Required] if singleLine is not provided -> path to template file (This can contin input symbols)", 
+      "path":             "[Required] if singleLine is not provided -> path to template file (This can contain input symbols)", 
       "singleLine":       "[Required] if path is not provided -> Value is treated as template (This can contain input symbols)", 
 
       "updateTargets":    [],
@@ -118,7 +126,7 @@ Templates are the snippets of code or text you would like to use to update exist
   }
 ```
 
-### Welcome_template.txt (Example Template)
+## Welcome_template.txt (Example Template)
 In this example the template specifies one create target `welcome_template`. Since the template does not specify any `symbolArguements` we will consider swapping out any matched input symbols while parsing. Once the template matched input symbols have been replaced we will output the result to any listed create or update targets. In this case only the create target `welcome_template` needs this information.
 
 #### Example Recipe
@@ -145,7 +153,7 @@ In this example the template specifies one create target `welcome_template`. Sin
 ]
 ```
 
-#### Template Pre-compile
+### Template Pre-compile
 ```
 Hello ${CANDIDATE_NAME},
 
@@ -155,11 +163,13 @@ Looking forward to meeting you,
 
 ${AUTHOR_NAME}
 ```
-#### Template post compile (This text will be provided to the output target)
+<p><br></p>
+
+### Template Post-compile (This text will be provided to the output target)
 ```
 Hello Bruce,
 
-Welcome to the team! We are so excited you are joining the team as a billionare.
+Welcome to the team! We are so excited you are joining the team as a billionaire.
 
 Looking forward to meeting you,
 
@@ -206,7 +216,7 @@ A create target describes a new file that will be created from a populated templ
 
 
 # Known Issues
-* Detecting a p4 workspace is still expiremental
+* Detecting a p4 workspace is still experimental
 
 
 **Enjoy!**
