@@ -118,8 +118,8 @@ A template's `symbolArguements` property is optional exclusive list of input sym
       "name":             "[Optional] A name to give this template",
       "symbolArguements": [],
 
-      "path":             "[Required] if singleLine is not provided -> path to template file (This can contain input symbols)", 
-      "singleLine":       "[Required] if path is not provided -> Value is treated as template (This can contain input symbols)", 
+      "path":             "[Required] path to template file (This can contin input symbols)", 
+      "singleLine":       "[Required] value is treated as the template (This can contain input symbols)", 
 
       "updateTargets":    [],
       "createTargets":    []
@@ -188,8 +188,8 @@ An update target describes a file and criteria for how a populated template will
   "path":                         "[Required] The path of the file that will be updated, (This can contain input symbols)",
 
   "insertCriteria": {
-      "position":                 "[Required] before|after -> where the template will be inserted",
-      "matchMode":                "[Required] useString|useRegex -> how the line match will be evaluated",
+      "position":                 "[Required] where the template will be inserted (before|after)",
+      "matchMode":                "[Required] how the line match will be evaluated (useString|useRegex)",
 
       "insertAtLineMatching":     "[Required] This decides which line we will set as our update index for the template. If `stopSearchAtLineMatching` is not specifed the first match will be used",
 
