@@ -35,7 +35,7 @@ class RecipeTemplate implements Template {
         if (!path && !singleLine) {
             return false;
         }
-        if (!symbolArguements || !Array.isArray(symbolArguements)) {
+        if (symbolArguements && !Array.isArray(symbolArguements)) {
             return false;
         }
         if (updateTargets && !Array.isArray(updateTargets)) {
@@ -55,7 +55,7 @@ class RecipeTemplate implements Template {
             return arrayCandidate.some((value: any) => typeof value !== 'string' || !value);
         };
 
-        if (hasNonStrings(symbolArguements)) {
+        if (symbolArguements && hasNonStrings(symbolArguements)) {
             return false;
         }
         if (updateTargets && hasNonStrings(updateTargets)) {

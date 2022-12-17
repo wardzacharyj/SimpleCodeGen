@@ -219,7 +219,7 @@
                             "default": ""
                           }
                         },
-                        "required": ["title", "description", "value"]
+                        "required": ["title", "value"]
                       }
                     },
                     "defaultValue": {
