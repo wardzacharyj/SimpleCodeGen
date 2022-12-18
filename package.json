@@ -2,6 +2,14 @@
   "name": "simple-code-gen",
   "displayName": "Simple Code Gen",
   "description": "Create and update files from templates",
+  "author": {
+    "name": "Zachary Ward"
+  },
+  "publisher": "wardzacharyj",
+  "repository": {
+    "url": "https://github.com/wardzacharyj/SimpleCodeGen",
+    "type": "git"
+  },
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.73.0"
@@ -12,6 +20,7 @@
   "activationEvents": [
     "onCommand:simple-code-gen.generate"
   ],
+  "icon": "images/icon.png",
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
@@ -39,60 +48,6 @@
             "type": "object",
             "title": "Recipe Details",
             "description": "The contents of code generation process",
-            "default": {
-              "name": "Recipe name",
-              "inputs": [
-                {
-                  "title": "Title of input box",
-                  "suggestion": "Suggestion displayed in input box",
-                  "prompt": "Prompt for the input",
-                  "regexValidator": "",
-                  "regexErrorDescription": "Description of what the regex validator checks if present",
-                  "fixedChoices": [
-                      {
-                          "title": "Title",
-                          "description": "Description of the choice",
-                          "value": "The value of this choice"
-                      }
-                  ],
-                  "defaultValue": "The default value of this choice",
-                  "symbol": "${INPUT_SYMBOL}"
-                }
-              ],
-              "templates": [
-                {
-                  "name": "The name of the template",
-                  "singleLine": "Small text snippet that is used if a path is not provided",
-                  "path": "The path of your template",
-                  "symbolArguements": [
-                    "${INPUT_SYMBOL}"
-                  ],
-                  "targets": [
-                      "targetNameHere1",
-                      "targetNameHere2"
-                  ]
-                }
-              ],
-              "updateTargets": [
-                {
-                  "name": "Unique name of target",
-                  "path": "Path to file that will be updated",
-                  "insertCriteria": {
-                      "position": "before",
-                      "matchMode": "useString",
-                      "insertAtLineMatching": "Example String Match",
-                      "stopSearchAtLineMatching": "Example Stop Search String Match"
-                  }
-                }
-              ],
-              "createTargets": [
-                {
-                  "name": "Unique target name",
-                  "output_name": "${INPUT_SYMBOL}Component.cpp",
-                  "output_path": "Path to output the newly generated file"
-                }
-              ]
-            },
             "properties": {
               "name": {
                 "type": "string",
@@ -355,13 +310,9 @@
                       "type": "object",
                       "description": "The criteria used for determining where to insert template content",
                       "default": {
-                        "name": "",
-                        "path": "",
-                        "insertCriteria": {
-                          "position": "before",
-                          "matchMode": "useString",
-                          "insertAtLineMatching": ""
-                        }
+                        "position": "before",
+                        "matchMode": "useString",
+                        "insertAtLineMatching": ""
                       },
                       "properties": {
                         "position": {
