@@ -1,12 +1,16 @@
 import { promises as fs } from 'fs';
-import { window } from 'vscode';
+import { window, Uri,workspace } from 'vscode';
+
 import { InsertCriteria, InsertPosition, MatchMode, SymbolMap, UpdateTarget } from './types';
 import { isValidObject, handleWorkspaceFilePathSymbol, replaceMatchedSymbol } from './util';
+
+import PerforceSubscription from '../perforce_subscription';
 
 class RecipeUpdateTarget implements UpdateTarget {    
     name: string;
     path: string;
     insertCriteria: InsertCriteria;
+    private readonly p4Util: PerforceSubscription;
     private regexLineMatcher?: RegExp;
     private regexExitMatcher?: RegExp;
 
@@ -15,6 +19,7 @@ class RecipeUpdateTarget implements UpdateTarget {
         this.name = name;
         this.path = handleWorkspaceFilePathSymbol(path);
         this.insertCriteria = insertCriteria;
+        this.p4Util = new PerforceSubscription();
 
         const {
             matchMode,
@@ -85,11 +90,20 @@ class RecipeUpdateTarget implements UpdateTarget {
         try {
             // Revisit if this is not a reasonable assumption in terms of the size of files this will deal with
             this.transformSymbols(symbolMap);
+
+            const shouldUsePerforce: any = workspace.getConfiguration("simpleCodeGenerator").get("useP4Features");
+            if (shouldUsePerforce) {
+                const editResult = await this.p4Util.tryEdit(Uri.file(this.path));
+                if (!editResult) {
+                    throw Error('Failed to acquire edit permissions from p4');
+                }
+            }
+
             const rawResult = await fs.readFile(this.path);
             const normalizedSplitLines = rawResult.toString().replaceAll(/\r\n/g, '\n').split('\n');
             const insertIndex = this.findInsertIndex(normalizedSplitLines);
             if (insertIndex === -1) {
-                throw Error(`Recipe Update Target: ${this.path}\nFailed to find index to insert populated template`);
+                throw Error('Failed to find index to insert populated template');
             }
             normalizedSplitLines.splice(insertIndex, 0, content);
             const contentWithInsert = normalizedSplitLines.join('\n');

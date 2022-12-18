@@ -25,9 +25,9 @@
       "type": "object",
       "title": "Configuration",
       "properties": {
-        "simpleCodeGenerator.disablePerforceOperations": {
+        "simpleCodeGenerator.useP4Features": {
           "type": "boolean",
-          "description": "Flag that determines if the extension will skip perforce operations",
+          "description": "Flag that determines if the extension should use perforce operations when dealing with files",
           "default": false
         },
         "simpleCodeGenerator.recipes": {
