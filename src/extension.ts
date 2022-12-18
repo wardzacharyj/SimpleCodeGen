@@ -1,13 +1,22 @@
 import { ExtensionContext, commands, window, workspace } from 'vscode';
 
 import { Recipe } from './recipes';
+import PerforceSubscription from './perforce_subscription';
 
 export const activate = (context: ExtensionContext) => {
-	const disposable = commands.registerCommand('simple-code-gen.generate', async () => {
+
+	const perforceSubscription = new PerforceSubscription();
+	const recipeDisposableCommand = commands.registerCommand('simple-code-gen.generate', async () => {
 		
+		// 0. Add discovered p4 client names
+		const shouldUsePerforce: any = workspace.getConfiguration("simpleCodeGenerator").get("useP4Features");
+		if (shouldUsePerforce) {
+			await perforceSubscription.fetchWorkspaceMappings();
+		}
+
 		// 1. Load Recipes
-		const loadedConfig: any = workspace.getConfiguration("simpleCodeGenerator").get("recipes");
-		const allRecipes: Recipe[] = Recipe.parse(loadedConfig);
+		const loadedRecipesConfig: any = workspace.getConfiguration("simpleCodeGenerator").get("recipes");
+		const allRecipes: Recipe[] = Recipe.parse(loadedRecipesConfig);
 		const selectedQuickPickItem = await Recipe.promptForInput(allRecipes);
 		if (selectedQuickPickItem) {
 			const { recipe } = selectedQuickPickItem;
@@ -42,7 +51,11 @@ export const activate = (context: ExtensionContext) => {
 				}, []);
 				
 				for (const templateDependency of templateDependencies) {
-					await createTargetItem.generate(templateDependency, symbolMap);
+					const createResult = await createTargetItem.generate(templateDependency, symbolMap);
+					if (!createResult) {
+						window.showErrorMessage("One or more create target operations failed, aborting...");
+						return;
+					}
 				}
 			}
 
@@ -56,12 +69,18 @@ export const activate = (context: ExtensionContext) => {
 				}, []);
 
 				for (const templateDependency of templateDependencies) {
-					await updateTargetItem.generate(templateDependency, symbolMap);
+					const updateResult = await updateTargetItem.generate(templateDependency, symbolMap);
+					if (!updateResult) {
+						window.showErrorMessage("One or more update target operations failed, aborting...");
+						return;
+					}
 				}
 			}
 		}
 	});
-	context.subscriptions.push(disposable);
+
+	context.subscriptions.push(perforceSubscription);
+	context.subscriptions.push(recipeDisposableCommand);
 };
 
 export const deactivate = () => {};

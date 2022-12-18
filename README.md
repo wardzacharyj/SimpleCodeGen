@@ -1,6 +1,6 @@
 # Simple Code Generator
 
-This extension allows users to describe "recipes" for collecting user input values in order to transform existing files or create new ones.
+This extension allows users to describe "recipes" for collecting user input values in order to transform existing files or create new ones. 
 
 # Recipe
 You can specify multiple recipes in your `.vscode/settings.json` file. A recipe can be constructed and customized from the following components:
@@ -214,9 +214,18 @@ A create target describes a new file that will be created from a populated templ
 ```
 <p><br></p>
 
+# Perforce support
+If you want to extension to try to use p4 operations from detected enviroments please add the following to your `.vscode/settings.json`:
+```json
+{
+  "simpleCodeGenerator.useP4Features": true
+}
+```
 
-# Known Issues
+<p><br></p>
+
+## WIP/Issues
 * Detecting a p4 workspace is still experimental
 
 
-**Enjoy!**
+**Thank you!**

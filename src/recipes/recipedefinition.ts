@@ -99,13 +99,13 @@ class Recipe implements RecipeDefinition {
 					recipe,
 					label: name,
 					alwaysShow: false,
-					description: `(${inputs.length} inputs)`,
+					description: `(${inputs.length} input${inputs.length > 1 ? 's' : ''})`,
 					detail: `🖋  ${createText}${separtor}${updateText}`	
 				};
 			}),
 			{
 				placeHolder: 'Which recipe do you want to generate?',
-				title: ":page_with_curl: Code Generator Recipe Picker",
+				title: "Recipe Picker",
 			}
 		);
     }
