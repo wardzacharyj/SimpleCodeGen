@@ -7,13 +7,6 @@ export const activate = (context: ExtensionContext) => {
 
 	const perforceSubscription = new PerforceSubscription();
 	const recipeDisposableCommand = commands.registerCommand('simple-code-gen.generate', async () => {
-		
-		// 0. Add discovered p4 client names
-		const shouldUsePerforce: any = workspace.getConfiguration("simpleCodeGenerator").get("useP4Features");
-		if (shouldUsePerforce) {
-			await perforceSubscription.fetchWorkspaceMappings();
-		}
-
 		// 1. Load Recipes
 		const loadedRecipesConfig: any = workspace.getConfiguration("simpleCodeGenerator").get("recipes");
 		const allRecipes: Recipe[] = Recipe.parse(loadedRecipesConfig);
