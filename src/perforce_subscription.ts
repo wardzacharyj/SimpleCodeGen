@@ -77,11 +77,11 @@ class PerforceSubscription {
 
         const { added } = workspaceFoldersChangeEvent;
         for (const workspaceFolder of added) {
-            addEntryIfNew(workspaceFolder.uri);
+            await addEntryIfNew(workspaceFolder.uri);
         }
 
         for (const textDoc of workspace.textDocuments) {
-            addEntryIfNew(textDoc.uri);
+            await addEntryIfNew(textDoc.uri);
         }
     }
 
