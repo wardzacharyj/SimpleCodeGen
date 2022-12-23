@@ -36,7 +36,7 @@ export const perforceChangeListInput = async (pendingChangeLists: P4PendingChang
     const defaultQuickPickItem = {
         label: 'Default Change List',
         alwaysShow: false,
-        detail: quickPickItems[0].detail,
+        detail: '',
         description: '',
         changeNumberValue: DefaultChangeList
     };

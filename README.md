@@ -214,13 +214,37 @@ A create target describes a new file that will be created from a populated templ
 ```
 <p><br></p>
 
-# Perforce support
+# Perforce support (Experimental)
 If you want to extension to try to use p4 operations from detected enviroments please add the following to your `.vscode/settings.json`:
 ```json
 {
   "simpleCodeGenerator.useP4Features": true
 }
 ```
+## Detecting Workspaces
+The extension will attempt to determine the available workspaces for the current user by executing the following command and parsing the output. 
+```
+p4 clients --me
+```
+
+For every create or update target the extension will search through this list of known workpaces for a workspace root path that includes the output file path. The matched workspace for the create/update target will be specified in the edit/add command line arguements:
+```
+// Update Target
+p4 -c ${matched_workspace} edit example.txt
+
+// Create Target
+p4 -c ${matched_workspace} add example.txt
+```
+
+<p><br></p>
+
+## Detecting Pending Changelists
+The following command is used to determine the users pending change lists.
+```
+p4 changes --me -s pending
+```
+Note, the change list input picker displayed to the user will only show pending change lists for the workspace the extension is running in. If your create and update target(s) live in multiple different workspaces only the default change list option is supported.
+
 
 <p><br></p>
 
