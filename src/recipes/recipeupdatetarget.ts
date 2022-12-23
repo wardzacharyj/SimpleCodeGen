@@ -101,7 +101,7 @@ class RecipeUpdateTarget implements UpdateTarget {
 
             const rawResult = await fs.readFile(this.path);
             const stringResult = rawResult.toString();
-            const normalizedSplitLines = stringResult.replaceAll(/\r\n/g, '\n').split('\n');
+            const normalizedSplitLines = stringResult.replace(/\r\n/g, '\n').split('\n');
             const insertIndex = this.findInsertIndex(normalizedSplitLines);
             if (insertIndex === -1) {
                 throw Error('Failed to find index to insert populated template');
