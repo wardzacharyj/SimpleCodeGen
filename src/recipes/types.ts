@@ -54,7 +54,7 @@ export type UpdateTarget = {
     insertCriteria: InsertCriteria;
 
     transformSymbols: (symbolMap: SymbolMap) => void;
-    generate: (content: string, symbolMap: SymbolMap) => Promise<boolean>;
+    generate: (content: string, symbolMap: SymbolMap, changeList: string|undefined) => Promise<boolean>;
 };
 
 export type CreateTarget = {
@@ -63,5 +63,5 @@ export type CreateTarget = {
     outputPath: string;
 
     transformSymbols: (symbolMap: SymbolMap) => void;
-    generate: (content: string, symbolMap: SymbolMap) => Promise<boolean>;
+    generate: (content: string, symbolMap: SymbolMap, changeList: string|undefined) => Promise<boolean>;
 };

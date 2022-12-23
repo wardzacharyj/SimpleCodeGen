@@ -1,17 +1,17 @@
 import { ExtensionContext, commands, window, workspace } from 'vscode';
 
 import { Recipe } from './recipes';
-import PerforceSubscription from './perforce_subscription';
+import { PerforceSubscription, perforceChangeListInput, DefaultChangeList } from './perforce';
 
 export const activate = (context: ExtensionContext) => {
 
     const perforceSubscription = new PerforceSubscription();
     const recipeDisposableCommand = commands.registerCommand('simple-code-gen.generate', async () => {
 
-        // 0. Fetch workspaces for the current p4 user
+        // 1. Fetch workspaces and pending change lists
         const shouldUsePerforce: any = workspace.getConfiguration("simpleCodeGenerator").get("useP4Features");
         if (shouldUsePerforce) {
-            await perforceSubscription.fetchKnownWorkspaces();
+            await perforceSubscription.initialize();
         }
 
         // 1. Load Recipes
@@ -22,7 +22,7 @@ export const activate = (context: ExtensionContext) => {
             return;
         }
 
-        // 2. Build symbol map for selected recipe
+        // 2. Collect inputs from user to build symbol map for selected recipe
         const { recipe } = selectedQuickPickItem;
         const { name, inputs, templates, updateTargets, createTargets } = recipe;
         const symbolMap = new Map<string, string>();
@@ -34,6 +34,16 @@ export const activate = (context: ExtensionContext) => {
             }
             const { symbol, value } = uiResult;
             symbolMap.set(symbol, value);
+        }
+
+        // 3. Allow user to select a change list destination
+        let optionalChangeListNo: string|undefined = undefined;
+        if (shouldUsePerforce) {
+            const selectedChangeListNo = await perforceChangeListInput(perforceSubscription.findWorkspacePendingChangeLists());
+            if (!selectedChangeListNo) {
+                return;
+            }
+            optionalChangeListNo = (selectedChangeListNo === DefaultChangeList) ? undefined : selectedChangeListNo;
         }
 
         // 3. Compile template content
@@ -53,7 +63,7 @@ export const activate = (context: ExtensionContext) => {
             }, []);
 
             for (const templateDependency of templateDependencies) {
-                const createResult = await createTargetItem.generate(templateDependency, symbolMap);
+                const createResult = await createTargetItem.generate(templateDependency, symbolMap, optionalChangeListNo);
                 if (!createResult) {
                     window.showErrorMessage("One or more create target operations failed, aborting...");
                     return;
@@ -71,7 +81,7 @@ export const activate = (context: ExtensionContext) => {
             }, []);
 
             for (const templateDependency of templateDependencies) {
-                const updateResult = await updateTargetItem.generate(templateDependency, symbolMap);
+                const updateResult = await updateTargetItem.generate(templateDependency, symbolMap, optionalChangeListNo);
                 if (!updateResult) {
                     window.showErrorMessage("One or more update target operations failed, aborting...");
                     return;

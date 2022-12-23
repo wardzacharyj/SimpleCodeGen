@@ -3,7 +3,7 @@ import { window, Uri, workspace } from 'vscode';
 import { CreateTarget, SymbolMap } from './types';
 import { isValidObject, handleWorkspaceFilePathSymbol, replaceMatchedSymbol } from './util';
 
-import PerforceSubscription from '../perforce_subscription';
+import { PerforceSubscription } from '../perforce';
 
 
 class RecipeCreateTarget implements CreateTarget {
@@ -48,7 +48,7 @@ class RecipeCreateTarget implements CreateTarget {
         this.outputPath = replaceMatchedSymbol(this.outputPath, symbolMap);
     }
 
-    public async generate(content: string, symbolMap: SymbolMap): Promise<boolean> {
+    public async generate(content: string, symbolMap: SymbolMap, changeList: string|undefined): Promise<boolean> {
         this.transformSymbols(symbolMap);
         const filePath = `${this.outputPath}${this.outputPath && this.outputPath.endsWith('/') ? '' : '/'}${this.outputFileName}`;
         try {
@@ -57,7 +57,7 @@ class RecipeCreateTarget implements CreateTarget {
 
             const shouldUsePerforce: any = workspace.getConfiguration("simpleCodeGenerator").get("useP4Features");
             if (shouldUsePerforce) {
-                return await this.p4Util.tryAdd(Uri.file(filePath));
+                return await this.p4Util.tryAdd(Uri.file(filePath), changeList);
             }
             return true;
         }

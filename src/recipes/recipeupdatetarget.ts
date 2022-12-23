@@ -4,7 +4,7 @@ import { window, Uri,workspace } from 'vscode';
 import { InsertCriteria, InsertPosition, MatchMode, SymbolMap, UpdateTarget } from './types';
 import { isValidObject, handleWorkspaceFilePathSymbol, replaceMatchedSymbol } from './util';
 
-import PerforceSubscription from '../perforce_subscription';
+import { PerforceSubscription } from '../perforce/';
 
 class RecipeUpdateTarget implements UpdateTarget {    
     name: string;
@@ -86,14 +86,14 @@ class RecipeUpdateTarget implements UpdateTarget {
         this.insertCriteria.stopSearchAtLineMatching = replaceMatchedSymbol(this.insertCriteria.stopSearchAtLineMatching, symbolMap);
     }
 
-    public async generate(content: string, symbolMap: SymbolMap): Promise<boolean> {
+    public async generate(content: string, symbolMap: SymbolMap, changeList: string|undefined): Promise<boolean> {
         try {
             // Revisit if this is not a reasonable assumption in terms of the size of files this will deal with
             this.transformSymbols(symbolMap);
 
             const shouldUsePerforce: any = workspace.getConfiguration("simpleCodeGenerator").get("useP4Features");
             if (shouldUsePerforce) {
-                const editResult = await this.p4Util.tryEdit(Uri.file(this.path));
+                const editResult = await this.p4Util.tryEdit(Uri.file(this.path), changeList);
                 if (!editResult) {
                     throw Error('Failed to acquire edit permissions from p4');
                 }
