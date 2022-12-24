@@ -215,7 +215,7 @@ A create target describes a new file that will be created from a populated templ
 <p><br></p>
 
 # Perforce support (Experimental)
-If you want to extension to try to use p4 operations from detected enviroments please add the following to your `.vscode/settings.json`:
+If you want to allow the extension to try to use p4 operations from detected enviroments please add the following to your `.vscode/settings.json`:
 ```json
 {
   "simpleCodeGenerator.useP4Features": true
@@ -249,7 +249,7 @@ Note, the change list input picker displayed to the user will only show pending 
 <p><br></p>
 
 ## WIP/Issues
-* Detecting a p4 workspace is still experimental
+* P4 features are still experimental
 
 
 **Thank you!**
