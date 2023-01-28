@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import { window, Uri,workspace } from 'vscode';
 
 import { InsertCriteria, InsertPosition, MatchMode, SymbolMap, UpdateTarget } from './types';
-import { isValidObject, handleWorkspaceFilePathSymbol, replaceMatchedSymbol } from './util';
+import { isValidObject, handleWorkspaceFilePathSymbol, replaceMatchedSymbol, log } from './util';
 
 import { PerforceSubscription } from '../perforce/';
 
@@ -35,30 +35,60 @@ class RecipeUpdateTarget implements UpdateTarget {
         }
     }
 
+    private static appendLog(error: string) {
+        log.appendLine(`[RecipeUpdateTarget] - ${error}`);
+    }
+
     public static hasRequiredProperties(updateTargetCandidate: any) {
         if (!isValidObject(updateTargetCandidate)) {
+            RecipeUpdateTarget.appendLog(`Encountered a malformed object`);
             return false;
         }
         const { name, path, insertCriteria } = updateTargetCandidate;
-        if (!name || !path || !insertCriteria) {
+        if (!name) {
+            RecipeUpdateTarget.appendLog(`Encountered a update target missing the required 'name' property`);
             return false;
         }
+        if (!path) {
+            RecipeUpdateTarget.appendLog(`${name} is missing the required 'path' property`);
+            return false;
+        }
+        if (!insertCriteria) {
+            RecipeUpdateTarget.appendLog(`${name} is missing the required 'insertCriteria' property`);
+            return false;
+        }
+ 
         const { position, matchMode, insertAtLineMatching } = insertCriteria;
-        if (!position || !matchMode || !insertAtLineMatching) {
+        if (!position) {
+            RecipeUpdateTarget.appendLog(`${name} is missing the required 'position' property in the 'insertCriteria' object`);
+            return false;
+        }
+        if (!matchMode) {
+            RecipeUpdateTarget.appendLog(`${name} is missing the required 'matchMode' property in the 'insertCriteria' object`);
+            return false;
+        }
+
+        if (!insertAtLineMatching) {
+            RecipeUpdateTarget.appendLog(`${name} is missing the required 'insertAtLineMatching' property in the 'insertCriteria' object`);
             return false;
         }
 
         if (position !== InsertPosition.before && position !== InsertPosition.after) {
+            RecipeUpdateTarget.appendLog(`${name} 'position' property value is invalid, it must be either 'before' or 'after'`);
             return false;
         }
 
         if (matchMode !== MatchMode.useRegex && matchMode !== MatchMode.useString) {
+            RecipeUpdateTarget.appendLog(`${name} 'matchMode' property value is invalid, it must be either 'useString' or 'useRegex'`);
             return false;
         }
         return true;
     }
 
     public static parse(updateTargetList: any[]): RecipeUpdateTarget[] {
+        if (!updateTargetList) {
+            return [];
+        }
         return updateTargetList
             .filter(this.hasRequiredProperties)
             .map((filteredCandidate) => new RecipeUpdateTarget(filteredCandidate));
@@ -95,7 +125,9 @@ class RecipeUpdateTarget implements UpdateTarget {
             if (shouldUsePerforce) {
                 const editResult = await this.p4Util.tryEdit(Uri.file(this.path), changeList);
                 if (!editResult) {
-                    throw Error('Failed to acquire edit permissions from p4');
+                    const errorMessage = 'Failed to acquire edit permissions from p4';
+                    RecipeUpdateTarget.appendLog(errorMessage);
+                    throw Error(errorMessage);
                 }
             }
 
@@ -104,14 +136,18 @@ class RecipeUpdateTarget implements UpdateTarget {
             const normalizedSplitLines = stringResult.replace(/\r\n/g, '\n').split('\n');
             const insertIndex = this.findInsertIndex(normalizedSplitLines);
             if (insertIndex === -1) {
-                throw Error('Failed to find index to insert populated template');
+                const errorMessage = 'Failed to find index to insert populated template';
+                RecipeUpdateTarget.appendLog(errorMessage);
+                throw Error(errorMessage);
             }
             normalizedSplitLines.splice(insertIndex, 0, content);
             const contentWithInsert = normalizedSplitLines.join('\n');
             await fs.writeFile(this.path, contentWithInsert);
         }
         catch(error) {
-            window.showErrorMessage(`Recipe Update Target: ${this.path}\nWrite Failed\n${error}`);
+            const errorMessage = `Recipe Update Target: ${this.path}\nWrite Failed\n${error}`;
+            RecipeUpdateTarget.appendLog(errorMessage);
+            window.showErrorMessage(errorMessage);
             return false;
         }
         return true;

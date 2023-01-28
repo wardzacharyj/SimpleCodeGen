@@ -3,7 +3,10 @@ import RecipeTemplate from './recipetemplate';
 import RecipeUpdateTarget from './recipeupdatetarget';
 import RecipeCreateTarget from './recipecreatetarget';
 
+import { log } from './util';
+
 import { window } from 'vscode';
+
 
 type RecipePickerQuickPick = {
     readonly recipe: Recipe,
@@ -37,6 +40,10 @@ class Recipe implements RecipeDefinition {
         this.createTargets = createTargets;
     }
 
+    private static appendLog(error: string) {
+        log.appendLine(`[Recipe] - ${error}`);
+    }
+
     public static convert(recipeCandidate: any): Recipe {
         const { name, inputs, templates, updateTargets, createTargets } = recipeCandidate;
         const recipe: Recipe = {
@@ -52,26 +59,36 @@ class Recipe implements RecipeDefinition {
     public static validate(recipe: Recipe): boolean {
         const { name, templates, updateTargets, createTargets } = recipe;
         if (!name) {
+            Recipe.appendLog(`Encountered a recipe missing the required 'name' property`);
             return false;
         }
 
-        if (!templates || templates.length === 0) {
+        if (!templates) {
+            Recipe.appendLog(`Encountered a recipe missing the required 'templates' property`);
+            return false;
+        }
+
+        if (templates.length === 0) {
+            Recipe.appendLog(`Encountered a recipe missing at least one template object. Please make sure the recipe contains at least one template object`);
             return false;
         }
 
         if (!updateTargets && !createTargets) {
+            Recipe.appendLog(`Encountered a recipe missing the 'updateTargets' and 'createTargets' property. At least one must be specified`);
             return false;
         }
 
         if (updateTargets
             && !createTargets
             && updateTargets.length === 0) {
+            Recipe.appendLog(`Encountered a recipe that only specifies the 'updateTargets' property, but does not contain any update target objects. Please make sure at least one is specified`);
             return false;
         }
 
         if (createTargets
             && !updateTargets
             && createTargets.length === 0) {
+            Recipe.appendLog(`Encountered a recipe that only specifies the 'createTargets' property, but does not contain any create target objects. Please make sure at least one is specified`);
             return false;
         }
 
@@ -79,6 +96,7 @@ class Recipe implements RecipeDefinition {
             && createTargets
             && updateTargets.length === 0
             && createTargets.length === 0) {
+            Recipe.appendLog(`Encountered a recipe with both the 'updateTargets' and 'createTargets' property specified, but both properties are of length zero. Please make sure at least one is specified`);
             return false;
         }
         return true;

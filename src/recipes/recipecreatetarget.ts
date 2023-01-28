@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import { window, Uri, workspace } from 'vscode';
 import { CreateTarget, SymbolMap } from './types';
-import { isValidObject, handleWorkspaceFilePathSymbol, replaceMatchedSymbol } from './util';
+import { isValidObject, handleWorkspaceFilePathSymbol, replaceMatchedSymbol, log } from './util';
 
 import { PerforceSubscription } from '../perforce';
 
@@ -20,24 +20,35 @@ class RecipeCreateTarget implements CreateTarget {
         this.p4Util = new PerforceSubscription();
     }
 
+    private static appendLog(error: string) {
+        log.appendLine(`[RecipeCreateTarget] - ${error}`);
+    }
+
     public static hasRequiredProperties(createTargetCandidate: any) {
         if (!isValidObject(createTargetCandidate)) {
+            RecipeCreateTarget.appendLog(`Encountered a malformed object`);
             return false;
         }
         const { name, outputFileName, outputPath } = createTargetCandidate;
         if (!name) {
+            RecipeCreateTarget.appendLog(`Encountered a create target missing the required 'name' property`);
             return false;
         }
         if (!outputFileName) {
+            RecipeCreateTarget.appendLog(`Encountered a create target missing the required 'outputFileName' property`);
             return false;
         }
         if (!outputPath) {
+            RecipeCreateTarget.appendLog(`Encountered a create target missing the required 'outputPath' property`);
             return false;
         }
         return true;
     }
 
     public static parse(createTargetList: any[]): RecipeCreateTarget[] {
+        if (!createTargetList) {
+            return [];
+        }
         return createTargetList
             .filter(this.hasRequiredProperties)
             .map((filteredCandidate) => new RecipeCreateTarget(filteredCandidate));
@@ -62,7 +73,9 @@ class RecipeCreateTarget implements CreateTarget {
             return true;
         }
         catch(error) {
-            window.showErrorMessage(`Create target: ${filePath}\nWrite failed:\n${error}`);
+            const errorMessage = `Create target: ${filePath}\nWrite failed:\n${error}`;
+            RecipeCreateTarget.appendLog(errorMessage);
+            window.showErrorMessage(errorMessage);
             return false;
         }
         return true;
