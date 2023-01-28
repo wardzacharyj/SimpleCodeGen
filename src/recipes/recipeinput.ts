@@ -100,6 +100,9 @@ class RecipeInput implements Input {
     };
 
     public static parse(jsonInputList: any[]): RecipeInput[] {
+        if (!jsonInputList) {
+            return [];
+        }
         return jsonInputList
             .filter(RecipeInput.hasRequiredProperties)
             .map((recipeItem) => new RecipeInput(recipeItem));

@@ -1,4 +1,4 @@
-import { workspace } from "vscode";
+import { workspace, window } from "vscode";
 import { SymbolMap } from "./types";
 
 export function isValidObject(anyObject: any) {
@@ -31,3 +31,8 @@ export function replaceMatchedSymbol(stringValue: string|undefined, symbolMap: S
     }
     return outputStringValue;
 }
+
+
+const log = window.createOutputChannel("Simple-Code-Generator Log");
+log.show();
+export { log };
