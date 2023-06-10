@@ -9,45 +9,67 @@ You can specify multiple recipes in your `.vscode/settings.json` file. A recipe 
 * [Update Targets](#update-targets)
 * [Create Targets](#create-targets)
 
+### Example Recipe (~/workpace/.vscode/settings.json)
+```json
+{
+  "simpleCodeGenerator.recipes": [
+    {
+      "name": "Finalize Report",
+      "inputs": [
+          {
+            "title": "Year",
+            "suggestion": "Year...",
+            "prompt": "Please enter a year",
+            "symbol": "${YEAR}",
+            "regexValidator": "^(19|20)\\d{2}$",
+            "regexErrorDescription": "Only years after 1900 are valid",
+          }
+      ],
+      "templates": [
+        {
+          "name": "Predicted Report Disclaimer Template",
+          "path": "${workspace}/report_disclaimer_template.txt",
+          "updateTargets": ["Predicted Report Target"],
+        },
+        {
+          "name": "Final Report Approval Template",
+          "path": "${workspace}/final_report_approval_template.txt",
+          "updateTargets": ["Final Report Target"],
+        },
+      ],
+        "updateTargets": [
+          {
+            "name": "Predicted Report Target",
+            "path": "${workspace}/predicted_report_${YEAR}.txt",
+            "insertCriteria": {
+              "position": "after",
+              "matchMode": "useString",
+              "insertAtLineMatching": "Disclaimer Information"
+            },
+          }
+        ],
+        "createTargets": [
+          {
+            "name": "Final Report Target",
+            "outputPath": "${workspace}/final_reports",
+            "outputFileName": "${YEAR}_final_report.txt"
+          }
+        ]
+      }
+    ]
+}
+```
+
+# Inputs
+
+A recipe's optional list of inputs allows you to specify symbols or keywords that should be replaced if encountered in `templates`, `updateTargets`, or in the recipe object in the `settings.json` object itself. For example, if a recipe contaied an input object that collected a year from a user and mapped it to a symbol called `${YEAR}` this symbol would be replaced by the user provided value.
+
+
 <figure>
     <img src='images/recipe_picker.png' alt='recipe_picker' />
     <figcaption><i>Recipe Picker</i></figcaption>
 </figure>
 <p><br></p>
-
-# Inputs
-
-A recipe's optional list of inputs allows you to specify symbols or keywords that should be replaced if encountered in templates, update targets, or the recipe object itself. For example, if a recipe contaied an input object that collected a year from a user and mapped it to a symbol called `${YEAR}` this symbol would be replaced by the user provided value.
-
-### Example Recipe (~/workpace/.vscode/settings.json)
-Only relevant fields are included in this snippet
-```json
-"simpleCodeGen.recipes": [
-  {
-    "name": "Finalize Report",
-    "inputs": [
-      {
-        "title": "Year",
-        "suggestion": "Year...",
-        "prompt": "Please enter a year",
-        "symbol": "${YEAR}",
-        "regexValidator": "^(19|20)\\d{2}$",
-        "regexErrorDescription": "Only years after 1900 are valid",
-      }
-    ],
-    "updateTargets": [
-      {        
-        "path": "predicted_report_${YEAR}.txt // --> path becomes: collected_report_2022" 
-      }
-    ],
-    "createTargets": [
-      {
-        "outputPath": "${workspace}/final_reports_${YEAR} // --> your_workspace/final_reports_2022"
-      }
-    ]
-  }
-]
-```
 
 <figure>
     <img src='images/text_input_example.png' alt='text input example' />
@@ -93,7 +115,7 @@ Only relevant fields are included in this snippet
   "suggestion":      "[Required] Preview shown when the input box is empty",
   "prompt":          "[Required] Text suggestion under the input box",
   "symbol":          "[Required] Symbol that will be replaced with the provided value",
-  "fixedChoices": [
+  "fixedChoices": [ /* [Optional] but contains required fields if used */
     {
       "title":       "[Required] Title to display for the option",
       "value":       "[Required] Value to swap with located symbol",
@@ -107,21 +129,25 @@ Only relevant fields are included in this snippet
 
 # Templates
 
-Templates are the snippets of code or text you would like to use to update existing files or create new ones. Templates can either be written in the recipe itself using the `singleLine` property or read from a file using the `path` property. New lines and whitespace are preserved in both. 
+Templates are the required snippets of code or text you would like to use to update existing files or create new ones. Templates can either be written in the recipe itself using the `singleLine` property or read from a file using the `path` property. New lines and whitespace are preserved in both. 
 
-A template's `symbolArguements` property is optional exclusive list of input symbols that will be evaluated. The default behavior will consider all input symbols for this template, but you can use this property if you want to limit the inputs to a smaller subset.
+A template's `symbolArguements` property is an optional exclusive list of input symbols that will be evaluated. The default behavior will consider all input symbols for this template, but you can use this property if you want to limit the inputs to a smaller subset.
 
- A template must have at least one entry in `updateTargets` or `createTargets`. The target string should match the `name` property of the updateTarget or createTarget.
+ A template must have at least one entry in `updateTargets` or `createTargets`. The target string should exactly match the `name` property of the updateTarget or createTarget. This is how a target will check its dependencies later.
 
 ```json
   {
-      "name":             "[Optional] A name to give this template",
-      "symbolArguements": [],
+      "name":             "[Required] A name to give this template",
 
+      /* [Optional] */
+      "symbolArguements": ["${YEAR}"],
+
+      /* [Required] One of 'path' or 'singleLine' required */
       "path":             "[Required] path to template file (This can contin input symbols)", 
       "singleLine":       "[Required] value is treated as the template (This can contain input symbols)", 
 
-      "updateTargets":    [],
+      /* [Required] At least one entry in 'updateTargets' or 'createTargets' */
+      "updateTargets":    ["Output Target Name"],
       "createTargets":    []
   }
 ```
@@ -131,12 +157,28 @@ In this example the template specifies one create target `welcome_template`. Sin
 
 #### Example Recipe
 ```json
-"simpleCodeGen.recipes": [
+"simpleCodeGenerator.recipes": [
   {
     "inputs": [
-      "_comment": "/* ${CANDIDATE_NAME}, ${JOB_TITLE}, ${AUTHOR} */ | Inputs we are collecting for this recipe"
+      {
+        "title": "Candidate's Name",
+        "suggestion": "Candidate's name...",
+        "prompt": "Please enter the candidate's name",
+        "symbol": "${CANDIDATE_NAME}",
+      },
+      {
+        "title": "Job Title",
+        "suggestion": "Job Title...",
+        "prompt": "Please enter the job title",
+        "symbol": "${JOB_TITLE}",
+      },
+      {
+        "title": "Sender",
+        "suggestion": "Sender...",
+        "prompt": "Please enter the name of the sender",
+        "symbol": "${SENDER}",
+      },
     ],
-
     "templates": {
       "path": "${workspace}/welcome_template.txt",
       "createTargets": ["welcome_candidate"]
@@ -161,7 +203,7 @@ Welcome to the team! We are so excited you are joining the team as a ${JOB_TITLE
 
 Looking forward to meeting you,
 
-${AUTHOR_NAME}
+${SENDER}
 ```
 <p><br></p>
 
@@ -179,7 +221,7 @@ Lucius Fox
 
 # Update Targets
 
-An update target describes a file and criteria for how a populated template will be used to update a file. The `name` property of an update target must match exactly with the `update_targets` array specified by a template, otherwise it will be ignored.
+An update target describes an existing file and criteria for how a populated template should be used to update that file. The `name` property of an update target must match exactly with a name in a template's `update_targets` dependency array, otherwise it will be ignored.
 
 ### Update Target Properties
 ```json

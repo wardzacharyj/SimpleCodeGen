@@ -73,6 +73,16 @@ export const activate = (context: ExtensionContext) => {
                     return;
                 }
             }
+
+            // Still allow for empty create target files to be created even if they do not have template dependencies
+            if (templateDependencies.length === 0)
+            {
+                const createResult = await createTargetItem.generate("", symbolMap, optionalChangeListNo);
+                if (!createResult) {
+                    window.showErrorMessage("Failed to write out empty create target, aborting...");
+                    return;
+                }
+            }
         }
 
         // 5. Process update target over compiled templates
