@@ -112,8 +112,8 @@ class RecipeTemplate implements Template {
             return replaceMatchedSymbol(stringContent, options, this.symbolArguements);
         }
         catch (error) {
-            RecipeTemplate.appendLog(`${this.name}\nCompile Failed:\n${error}`);
-            window.showErrorMessage(`Recipe Template ${this.name}\nCompile Failed:\n${error}`);
+            RecipeTemplate.appendLog(`${this.name} Compile Failed:\n${error}`);
+            window.showErrorMessage(`Recipe Template ${this.name} Compile Failed:\n${error}`);
         }
         return '';
     }

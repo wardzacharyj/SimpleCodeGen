@@ -228,6 +228,17 @@
                       "description": "A file path to the file containing the template text, will be ignored if singleLine is present",
                       "default": ""
                     },
+                    "symbolArguements": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "description": "An array of unique input symbols that will exclusively be considered for this tempalte. The default behavior is to consider all available symbols",
+                      "default": [],
+                      "items": {
+                        "type": "string",
+                        "description": "A unqiue update target name",
+                        "default": ""
+                      }
+                    },
                     "updateTargets": {
                       "type": "array",
                       "uniqueItems": true,
@@ -253,28 +264,28 @@
                   },
                   "oneOf": [
                     {
-                      "required": ["name", "path", "symbolArguements", "updateTargets", "createTargets"],
-                      "not": { "required": ["singleLine"] }
+                      "required": ["name", "path", "updateTargets", "createTargets"],
+                      "not": { "required": ["singleLine", "symbolArguements"] }
                     },
                     {
-                      "required": ["name", "path", "symbolArguements", "updateTargets"],
-                      "not": { "required": ["singleLine", "createTargets"] }
+                      "required": ["name", "path", "updateTargets"],
+                      "not": { "required": ["singleLine", "createTargets", "symbolArguements"] }
                     },
                     {
-                      "required": ["name", "path", "symbolArguements", "createTargets"],
-                      "not": { "required": ["singleLine", "updateTargets"] }
+                      "required": ["name", "path", "createTargets"],
+                      "not": { "required": ["singleLine", "updateTargets", "symbolArguements"] }
                     },
                     {
-                      "required": ["name", "singleLine", "symbolArguements", "updateTargets", "createTargets"],
-                      "not": { "required": ["path"] }
+                      "required": ["name", "singleLine", "updateTargets", "createTargets"],
+                      "not": { "required": ["path", "symbolArguements"] }
                     },
                     {
-                      "required": ["name", "singleLine", "symbolArguements", "updateTargets"],
-                      "not": { "required": ["path", "createTargets"] }
+                      "required": ["name", "singleLine", "updateTargets"],
+                      "not": { "required": ["path", "createTargets", "symbolArguements"] }
                     },
                     {
-                      "required": ["name", "singleLine", "symbolArguements", "createTargets"],
-                      "not": { "required": ["path", "updateTargets"] }
+                      "required": ["name", "singleLine", "createTargets"],
+                      "not": { "required": ["path", "updateTargets", "symbolArguements"] }
                     }
                   ]
                 }
