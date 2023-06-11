@@ -34,7 +34,7 @@ You can specify multiple recipes in your `.vscode/settings.json` file. A recipe 
         {
           "name": "Final Report Approval Template",
           "path": "${workspace}/final_report_approval_template.txt",
-          "updateTargets": ["Final Report Target"],
+          "createTargets": ["Final Report Target"],
         },
       ],
         "updateTargets": [
