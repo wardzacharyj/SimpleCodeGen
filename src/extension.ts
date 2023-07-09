@@ -41,7 +41,8 @@ export const activate = (context: ExtensionContext) => {
         // 3. Allow user to select a change list destination
         let optionalChangeListNo: string|undefined = undefined;
         if (shouldUsePerforce) {
-            const selectedChangeListNo = await perforceChangeListInput(perforceSubscription.findWorkspacePendingChangeLists());
+            const wsPendingChangeLists = perforceSubscription.findWorkspacePendingChangeLists();
+            const selectedChangeListNo = await perforceChangeListInput(wsPendingChangeLists);
             if (!selectedChangeListNo) {
                 return;
             }
