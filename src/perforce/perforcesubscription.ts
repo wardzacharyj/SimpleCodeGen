@@ -5,6 +5,9 @@ import { Uri, workspace, window } from 'vscode';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
+import * as path from 'path';
+
+
 const asyncExec = promisify(exec);
 
 
@@ -27,39 +30,21 @@ class PerforceSubscription {
         // required to register subscription
     }
 
-    private scorePathMatch(workspaceItem: P4Workspace, filePath: string): number {
-        const wsRootPath = workspaceItem.root;
-        if (filePath.startsWith(wsRootPath)) {
-            return 1.0;
-        }
-
-        let matchScore = 0;
-        const score_per_match = 1.0 / wsRootPath.length;
-        for (let ii = 0; ii < wsRootPath.length; ii++) {
-            if (wsRootPath.charAt(ii) === filePath.charAt(ii)) {
-                matchScore += score_per_match;
-            }
-            else if (wsRootPath.charAt(ii).toLowerCase() !== filePath.charAt(ii).toLowerCase()) {
-                return -1.0;
-            }
-        }
-        return matchScore;
+    private isWithinWorkspace(workspaceItem: P4Workspace, filePath: string): boolean {
+        const normalizedWorkspaceRoot = path.normalize(workspaceItem.root);
+        const normalizedSearchPath = path.normalize(filePath);
+        const relativeResult = path.relative(normalizedSearchPath, normalizedWorkspaceRoot);
+        return (!relativeResult.startsWith('..') && !path.isAbsolute(relativeResult)) || relativeResult === "";
     }
 
     private findWorkspaceForFile(fileUri: Uri): P4Workspace | undefined {
-        let bestPathScore = 0.0;
-        let bestMatch: P4Workspace | undefined;
-
-        // Find the workspace with the longest root path that includes the file path, attempt to handle case insensative FS
-        // ex: windows: FOO.txt and foo.txt will be treated as equivalent files
-        PerforceSubscription.workspaceList.forEach((workspaceItem) => {
-            const pathScore = this.scorePathMatch(workspaceItem, fileUri.fsPath);
-            if (pathScore >= bestPathScore && !bestMatch || (bestMatch && bestMatch.root.length < workspaceItem.root.length)) {
-                bestMatch = workspaceItem;
-                bestPathScore = pathScore;
+        for (const workspaceItem of PerforceSubscription.workspaceList)
+        {
+            if (this.isWithinWorkspace(workspaceItem, fileUri.fsPath)) {
+                return workspaceItem;
             }
-        });
-        return bestMatch;
+        }
+        return undefined;
     }
 
     private async fetchKnownWorkspaces(): Promise<boolean> {
